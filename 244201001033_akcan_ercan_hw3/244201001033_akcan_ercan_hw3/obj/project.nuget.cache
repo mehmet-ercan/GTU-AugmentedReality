@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "J98mdrOFle8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Pc\\Documents\\Unity Projects\\GTU-AugmentedReality\\244201001033_akcan_ercan_hw3\\244201001033_akcan_ercan_hw3\\244201001033_akcan_ercan_hw3.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Pc\\.nuget\\packages\\mathnet.numerics\\5.0.0\\mathnet.numerics.5.0.0.nupkg.sha512",
+    "C:\\Users\\Pc\\.nuget\\packages\\microsoft.win32.systemevents\\9.0.0\\microsoft.win32.systemevents.9.0.0.nupkg.sha512",
+    "C:\\Users\\Pc\\.nuget\\packages\\system.drawing.common\\9.0.0\\system.drawing.common.9.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
