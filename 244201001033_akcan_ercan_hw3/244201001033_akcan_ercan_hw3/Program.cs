@@ -10,7 +10,7 @@ namespace _244201001033_akcan_ercan_hw3
         static void Main(string[] args)
         {
             // Load the images
-            string inputImagePath = "Homework_3_img2.JPG";
+            string inputImagePath = "Homework_3_img3.JPG";
             string checkerImagePath = "checkerboard_7x9_700x900.jpg";
 
             Bitmap inputImage = new(inputImagePath);
@@ -23,19 +23,19 @@ namespace _244201001033_akcan_ercan_hw3
             //     { 450, 2610 }
             // };
 
-            var srcPoints_im2 = new double[,] {
-                { 285, 510 },
-                { 1948, 448 },
-                { 1925, 2695 },
-                { 250, 2608 }
-            };
-
-            // var srcPoints_im3 = new double[,] {
-            //     { 476, 518 },
-            //     { 2088, 540 },
-            //     { 2070, 2620 },
-            //     { 450, 2610 }
+            // var srcPoints_im2 = new double[,] {
+            //     { 285, 510 },
+            //     { 1948, 448 },
+            //     { 1925, 2695 },
+            //     { 250, 2608 }
             // };
+
+            var srcPoints_im3 = new double[,] {
+                { 493, 596 },
+                { 2145, 721 },
+                { 1945, 2619 },
+                { 489, 2677 }
+            };
 
             var dstPoints = new double[,] {
                 { 0, 0 },
@@ -44,12 +44,12 @@ namespace _244201001033_akcan_ercan_hw3
                 { 0, 900 }
             };
 
-            double[,] homographyMatrix = FindHomography(srcPoints_im2, dstPoints);
+            double[,] homographyMatrix = FindHomography(srcPoints_im3, dstPoints);
             // double[,]? homographyMatrixRansac = FindHomographyRansac(srcPoints_im2, dstPoints);
             Bitmap outputImage = WarpImage(inputImage, homographyMatrix, checkerImage.Width, checkerImage.Height);
             // Bitmap outputImageRansac = WarpImage(inputImage, homographyMatrixRansac, checkerImage.Width, checkerImage.Height);
 
-            outputImage.Save("warpedImage_d.jpg");
+            outputImage.Save("warpedImage.jpg");
             // outputImageRansac.Save("warpedImageRansac.jpg");
             Console.WriteLine($"Warped image saved at: warpedImage");
         }
