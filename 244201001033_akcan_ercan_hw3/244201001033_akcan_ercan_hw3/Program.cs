@@ -44,7 +44,7 @@ namespace _244201001033_akcan_ercan_hw3
         private static void Image_1_Processing(double[,] srcPoints_im3, double[,] dstPoints)
         {
             // Load the images
-            string inputImagePath = "Homework_3_img3.JPG";
+            string inputImagePath = "Homework_3_img1.JPG";
             string checkerImagePath = "checkerboard_7x9_700x900.jpg";
 
             Bitmap inputImage = new(inputImagePath);
@@ -57,23 +57,111 @@ namespace _244201001033_akcan_ercan_hw3
             Bitmap outputImageRansac = WarpImage(inputImage, homographyMatrixRansac, checkerImage.Width, checkerImage.Height);
 
             outputImage.Save("warpedImage_1.jpg");
-            outputImageRansac.Save("warpedImageRansac.jpg");
-            Console.WriteLine($"Warped image_1/ransacimage_! saved.");
-
-            // Example scene point [x, y, 1]
-            double[] scenePoint = [175, 225]; 
-
-            // Example image point [u, v]
-            double[] imagePoint = [333, 125];
+            outputImageRansac.Save("warpedImageRansac_1.jpg");
+            Console.WriteLine($"Warped image_1/ransacimage_1 saved. \n");
+  
+            double[] scenePoint = [175, 225];      // Example scene point [x, y, 1]
+            double[] imagePoint = [333, 125];     // Example image point [u, v]
 
             // Project scene point onto the target image
-            var projectedImagePoint = CalculateProjectionOnImage(scenePoint, homographyMatrix);
-            Console.WriteLine($"Projected Image Point: u = {projectedImagePoint.u}, v = {projectedImagePoint.v}");
+            var (u, v) = CalculateProjectionOnImage(scenePoint, homographyMatrix);
+            Console.WriteLine($"Projected Image Point: u = {u}, v = {v}");
 
             // Project image point back onto the scene
-            var projectedScenePoint = CalculateProjectionOnScene(imagePoint, homographyMatrix);
-            Console.WriteLine($"Projected Scene Point: x = {projectedScenePoint.x}, y = {projectedScenePoint.y}");
-        
+            var (x, y) = CalculateProjectionOnScene(imagePoint, homographyMatrix);
+            Console.WriteLine($"Projected Scene Point: x = {x}, y = {y} \n");
+
+            // Example manually identified correspondences
+            double[,] scenePoints = { { 100, 100 }, { 200, 100 }, { 200, 200 }, { 100, 200 }, { 150, 150 } };
+            double[,] imagePoints = { { 110, 90 }, { 220, 95 }, { 225, 205 }, { 115, 210 }, { 165, 160 } };
+
+            // Calculate homography
+            homographyMatrix = FindHomography(scenePoints, imagePoints);
+
+            Console.WriteLine("Homography Matrix:");
+            PrintMatrix(homographyMatrix);
+
+            // Test points
+            double[,] testScenePoints = { { 130, 130 }, { 180, 120 }, { 160, 180 } };
+            double[,] testImagePoints = { { 140, 120 }, { 200, 110 }, { 170, 190 } };
+
+            // Calculate errors
+            for (int i = 0; i < testScenePoints.GetLength(0); i++)
+            {
+                double[] p = [testScenePoints[i, 0], testScenePoints[i, 1]];
+                (double projectedPoint_u, double projectedPoint_v) = CalculateProjectionOnImage(p, homographyMatrix);
+
+                double[] projectedPoint = [projectedPoint_u, projectedPoint_v];
+                double error = CalculateError(testImagePoints[i, 0], testImagePoints[i, 1], projectedPoint[0], projectedPoint[1]);
+
+                Console.WriteLine($"Error for test point {i}: {error:F3}");
+            }
+
+            CalculateScenePointOnTheImage(homographyMatrix);
+            CalculateImagePointOnTheScene(homographyMatrix);
+        }
+
+        [SupportedOSPlatform("windows")]
+        static void CalculateScenePointOnTheImage(double[,] homographyMatrix) {
+            double[,] scenePoints = {
+                { 7.5, 5.5 },
+                { 6.3, 3.3 },
+                { 0.1, 0.1 }
+            };
+
+            // Calculate projection of each scene point onto the image
+            for (int i = 0; i < scenePoints.GetLength(0); i++)
+            {
+                double[] p = [scenePoints[i, 0], scenePoints[i, 1]];
+                (double projectedPoint_u, double projectedPoint_v) = CalculateProjectionOnImage(p, homographyMatrix);
+
+                double[] projectedPoint = [projectedPoint_u, projectedPoint_v];
+                Console.WriteLine($"Projected image point for S{i+1}: ({projectedPoint[0]:F3}, {projectedPoint[1]:F3})");
+            }
+            Console.WriteLine();
+        }
+
+        [SupportedOSPlatform("windows")]
+        static void CalculateImagePointOnTheScene(double[,] homographyMatrix) {
+            double[,] imagePoints = {
+                { 500, 400 },
+                { 86, 167 },
+                { 10, 10 }
+            };
+
+            // Calculate the inverse of the homography matrix
+            double[,] homographyInverse = InverseHomography(homographyMatrix);
+
+            // Project each image point back onto the scene
+            for (int i = 0; i < imagePoints.GetLength(0); i++)
+            {
+                double[] p = [imagePoints[i, 0], imagePoints[i, 1]];
+                (double scenePoint_u, double scenePoint_v) = CalculateProjectionOnScene(p, homographyInverse);
+
+                double[] scenePoint = [scenePoint_u, scenePoint_v];
+                Console.WriteLine($"Projected scene point for I{i+1}: ({scenePoint[0]:F3}, {scenePoint[1]:F3})");
+            }
+            Console.WriteLine();
+        }
+
+        [SupportedOSPlatform("windows")]
+        static void PrintMatrix(double[,] matrix)
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    Console.Write($"{matrix[i, j]:F3} ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+
+        [SupportedOSPlatform("windows")]
+        static double CalculateError(double u, double v, double uProjected, double vProjected)
+        {
+            return Math.Sqrt(Math.Pow(u - uProjected, 2) + Math.Pow(v - vProjected, 2));
         }
 
         [SupportedOSPlatform("windows")]
@@ -104,7 +192,7 @@ namespace _244201001033_akcan_ercan_hw3
             double w = 1; // Homogeneous coordinate
 
             // Compute the inverse homography matrix
-            double[,] inverseHomography = InvertMatrix(homographyMatrix);
+            double[,] inverseHomography = InverseHomography(homographyMatrix);
 
             // Perform matrix multiplication
             double xPrime = inverseHomography[0, 0] * u + inverseHomography[0, 1] * v + inverseHomography[0, 2] * w;
@@ -118,39 +206,47 @@ namespace _244201001033_akcan_ercan_hw3
             return (x, y);
         }
 
-        public static double[,] InvertMatrix(double[,] matrix)
-        {
-            double det = matrix[0, 0] * (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1])
-                        - matrix[0, 1] * (matrix[1, 0] * matrix[2, 2] - matrix[1, 2] * matrix[2, 0])
-                        + matrix[0, 2] * (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0]);
+        // public static double[,] InvertMatrix(double[,] matrix)
+        // {
+        //     double det = matrix[0, 0] * (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1])
+        //                 - matrix[0, 1] * (matrix[1, 0] * matrix[2, 2] - matrix[1, 2] * matrix[2, 0])
+        //                 + matrix[0, 2] * (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0]);
 
-            if (Math.Abs(det) < 1e-10) throw new InvalidOperationException("Matrix is not invertible.");
+        //     if (Math.Abs(det) < 1e-10) throw new InvalidOperationException("Matrix is not invertible.");
 
-            double[,] inv = new double[3, 3];
-            inv[0, 0] = (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1]) / det;
-            inv[0, 1] = (matrix[0, 2] * matrix[2, 1] - matrix[0, 1] * matrix[2, 2]) / det;
-            inv[0, 2] = (matrix[0, 1] * matrix[1, 2] - matrix[0, 2] * matrix[1, 1]) / det;
-            inv[1, 0] = (matrix[1, 2] * matrix[2, 0] - matrix[1, 0] * matrix[2, 2]) / det;
-            inv[1, 1] = (matrix[0, 0] * matrix[2, 2] - matrix[0, 2] * matrix[2, 0]) / det;
-            inv[1, 2] = (matrix[0, 2] * matrix[1, 0] - matrix[0, 0] * matrix[1, 2]) / det;
-            inv[2, 0] = (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0]) / det;
-            inv[2, 1] = (matrix[0, 1] * matrix[2, 0] - matrix[0, 0] * matrix[2, 1]) / det;
-            inv[2, 2] = (matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0]) / det;
+        //     double[,] inv = new double[3, 3];
+        //     inv[0, 0] = (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1]) / det;
+        //     inv[0, 1] = (matrix[0, 2] * matrix[2, 1] - matrix[0, 1] * matrix[2, 2]) / det;
+        //     inv[0, 2] = (matrix[0, 1] * matrix[1, 2] - matrix[0, 2] * matrix[1, 1]) / det;
+        //     inv[1, 0] = (matrix[1, 2] * matrix[2, 0] - matrix[1, 0] * matrix[2, 2]) / det;
+        //     inv[1, 1] = (matrix[0, 0] * matrix[2, 2] - matrix[0, 2] * matrix[2, 0]) / det;
+        //     inv[1, 2] = (matrix[0, 2] * matrix[1, 0] - matrix[0, 0] * matrix[1, 2]) / det;
+        //     inv[2, 0] = (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0]) / det;
+        //     inv[2, 1] = (matrix[0, 1] * matrix[2, 0] - matrix[0, 0] * matrix[2, 1]) / det;
+        //     inv[2, 2] = (matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0]) / det;
 
-            return inv;
-        }
+        //     return inv;
+        // }
 
         [SupportedOSPlatform("windows")]
         public static double[,] FindHomography(double[,] srcPoints, double[,] dstPoints)
         {
-            if (srcPoints.GetLength(0) != 4 || dstPoints.GetLength(0) != 4)
+            if (srcPoints.GetLength(0) < 4 || dstPoints.GetLength(0) < 4)
             {
-                throw new ArgumentException("Exactly 4 points are required for both source and destination.");
+                throw new ArgumentException("At least 4 points are required for both source and destination.");
             }
 
-            // Create the matrix A (8x9)
-            double[,] A = new double[8, 9];
-            for (int i = 0; i < 4; i++)
+            if (srcPoints.GetLength(0) != dstPoints.GetLength(0))
+            {
+                throw new ArgumentException("The number of source and destination points must match.");
+            }
+
+            int numPoints = srcPoints.GetLength(0);
+
+            // Create the matrix A (2n x 9)
+            double[,] A = new double[numPoints * 2, 9];
+            
+            for (int i = 0; i < numPoints; i++)
             {
                 double x = srcPoints[i, 0];
                 double y = srcPoints[i, 1];
@@ -185,7 +281,6 @@ namespace _244201001033_akcan_ercan_hw3
             var v = svd.VT.Transpose();
             var h = v.Column(v.ColumnCount - 1).ToArray();
 
-            // h into a 3x3 matrix
             double[,] H = new double[3, 3];
             for (int i = 0; i < 3; i++)
             {
