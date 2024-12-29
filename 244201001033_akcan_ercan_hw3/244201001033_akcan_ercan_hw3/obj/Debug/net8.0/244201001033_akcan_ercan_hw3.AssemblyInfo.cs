@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("244201001033_akcan_ercan_hw3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80fdf9a4b9cea128eff2b14e4d258f60ede5bb02")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7853c7a36902a98238da2a207da9634ab4c85df")]
 [assembly: System.Reflection.AssemblyProductAttribute("244201001033_akcan_ercan_hw3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("244201001033_akcan_ercan_hw3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

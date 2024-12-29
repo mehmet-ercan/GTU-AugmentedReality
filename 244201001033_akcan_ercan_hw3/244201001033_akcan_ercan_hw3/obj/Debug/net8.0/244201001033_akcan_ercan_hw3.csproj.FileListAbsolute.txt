@@ -40,3 +40,4 @@ C:\Users\Pc\Documents\Unity Projects\GTU-AugmentedReality\244201001033_akcan_erc
 C:\Users\Pc\Documents\Unity Projects\GTU-AugmentedReality\244201001033_akcan_ercan_hw3\244201001033_akcan_ercan_hw3\obj\Debug\net8.0\244201001033_akcan_ercan_hw3.pdb
 C:\Users\Pc\Documents\Unity Projects\GTU-AugmentedReality\244201001033_akcan_ercan_hw3\244201001033_akcan_ercan_hw3\obj\Debug\net8.0\244201001033_akcan_ercan_hw3.genruntimeconfig.cache
 C:\Users\Pc\Documents\Unity Projects\GTU-AugmentedReality\244201001033_akcan_ercan_hw3\244201001033_akcan_ercan_hw3\obj\Debug\net8.0\ref\244201001033_akcan_ercan_hw3.dll
+C:\Users\Pc\Documents\Unity Projects\GTU-AugmentedReality\244201001033_akcan_ercan_hw3\244201001033_akcan_ercan_hw3\obj\Debug\net8.0\244201001033_akcan_ercan_hw3.sourcelink.json

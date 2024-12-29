@@ -38,10 +38,12 @@ namespace _244201001033_akcan_ercan_hw3
             };
 
             Image_1_Processing(srcPoints_im1, dstPoints);
+            Image_2_Processing(srcPoints_im2, dstPoints);
+            Image_3_Processing(srcPoints_im3, dstPoints);
         }
 
         [SupportedOSPlatform("windows")]
-        private static void Image_1_Processing(double[,] srcPoints_im3, double[,] dstPoints)
+        private static void Image_1_Processing(double[,] srcPoints_im1, double[,] dstPoints)
         {
             // Load the images
             string inputImagePath = "Homework_3_img1.JPG";
@@ -50,15 +52,15 @@ namespace _244201001033_akcan_ercan_hw3
             Bitmap inputImage = new(inputImagePath);
             Bitmap checkerImage = new(checkerImagePath);
 
-            double[,] homographyMatrix = FindHomography(srcPoints_im3, dstPoints);
-            double[,]? homographyMatrixRansac = FindHomographyWithRansac(srcPoints_im3, dstPoints, 100000, 3.0);
+            double[,] homographyMatrix = FindHomography(srcPoints_im1, dstPoints);
+            double[,]? homographyMatrixRansac = FindHomographyWithRansac(srcPoints_im1, dstPoints, 100000, 3.0);
 
             Bitmap outputImage = WarpImage(inputImage, homographyMatrix, checkerImage.Width, checkerImage.Height);
             Bitmap outputImageRansac = WarpImage(inputImage, homographyMatrixRansac, checkerImage.Width, checkerImage.Height);
 
             outputImage.Save("warpedImage_1.jpg");
             outputImageRansac.Save("warpedImageRansac_1.jpg");
-            Console.WriteLine($"Warped image_1/ransacimage_1 saved. \n");
+            Console.WriteLine($"Warped without ransac image_1 / with ransacimage_1 saved. \n");
   
             double[] scenePoint = [175, 225];      // Example scene point [x, y, 1]
             double[] imagePoint = [333, 125];     // Example image point [u, v]
@@ -100,6 +102,130 @@ namespace _244201001033_akcan_ercan_hw3
             CalculateScenePointOnTheImage(homographyMatrix);
             CalculateImagePointOnTheScene(homographyMatrix);
         }
+
+        [SupportedOSPlatform("windows")]
+        private static void Image_2_Processing(double[,] srcPoints_im2, double[,] dstPoints)
+        {
+            // Load the images
+            string inputImagePath = "Homework_3_img2.JPG";
+            string checkerImagePath = "checkerboard_7x9_700x900.jpg";
+
+            Bitmap inputImage = new(inputImagePath);
+            Bitmap checkerImage = new(checkerImagePath);
+
+            double[,] homographyMatrix = FindHomography(srcPoints_im2, dstPoints);
+            double[,]? homographyMatrixRansac = FindHomographyWithRansac(srcPoints_im2, dstPoints, 100000, 3.0);
+
+            Bitmap outputImage = WarpImage(inputImage, homographyMatrix, checkerImage.Width, checkerImage.Height);
+            Bitmap outputImageRansac = WarpImage(inputImage, homographyMatrixRansac, checkerImage.Width, checkerImage.Height);
+
+            outputImage.Save("warpedImage_2.jpg");
+            outputImageRansac.Save("warpedImageRansac_2.jpg");
+            Console.WriteLine($"Warped without ransac image_2 / with ransacimage_2 saved. \n");
+  
+            double[] scenePoint = [175, 225];      // Example scene point [x, y, 1]
+            double[] imagePoint = [333, 125];     // Example image point [u, v]
+
+            // Project scene point onto the target image
+            var (u, v) = CalculateProjectionOnImage(scenePoint, homographyMatrix);
+            Console.WriteLine($"Projected Image Point: u = {u}, v = {v}");
+
+            // Project image point back onto the scene
+            var (x, y) = CalculateProjectionOnScene(imagePoint, homographyMatrix);
+            Console.WriteLine($"Projected Scene Point: x = {x}, y = {y} \n");
+
+            // Example manually identified correspondences
+            double[,] scenePoints = { { 100, 100 }, { 200, 100 }, { 200, 200 }, { 100, 200 }, { 150, 150 } };
+            double[,] imagePoints = { { 110, 90 }, { 220, 95 }, { 225, 205 }, { 115, 210 }, { 165, 160 } };
+
+            // Calculate homography
+            homographyMatrix = FindHomography(scenePoints, imagePoints);
+
+            Console.WriteLine("Homography Matrix:");
+            PrintMatrix(homographyMatrix);
+
+            // Test points
+            double[,] testScenePoints = { { 130, 130 }, { 180, 120 }, { 160, 180 } };
+            double[,] testImagePoints = { { 140, 120 }, { 200, 110 }, { 170, 190 } };
+
+            // Calculate errors
+            for (int i = 0; i < testScenePoints.GetLength(0); i++)
+            {
+                double[] p = [testScenePoints[i, 0], testScenePoints[i, 1]];
+                (double projectedPoint_u, double projectedPoint_v) = CalculateProjectionOnImage(p, homographyMatrix);
+
+                double[] projectedPoint = [projectedPoint_u, projectedPoint_v];
+                double error = CalculateError(testImagePoints[i, 0], testImagePoints[i, 1], projectedPoint[0], projectedPoint[1]);
+
+                Console.WriteLine($"Error for test point {i}: {error:F3}");
+            }
+
+            CalculateScenePointOnTheImage(homographyMatrix);
+            CalculateImagePointOnTheScene(homographyMatrix);
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void Image_3_Processing(double[,] srcPoints_im3, double[,] dstPoints)
+        {
+            // Load the images
+            string inputImagePath = "Homework_3_img3.JPG";
+            string checkerImagePath = "checkerboard_7x9_700x900.jpg";
+
+            Bitmap inputImage = new(inputImagePath);
+            Bitmap checkerImage = new(checkerImagePath);
+
+            double[,] homographyMatrix = FindHomography(srcPoints_im3, dstPoints);
+            double[,]? homographyMatrixRansac = FindHomographyWithRansac(srcPoints_im3, dstPoints, 100000, 3.0);
+
+            Bitmap outputImage = WarpImage(inputImage, homographyMatrix, checkerImage.Width, checkerImage.Height);
+            Bitmap outputImageRansac = WarpImage(inputImage, homographyMatrixRansac, checkerImage.Width, checkerImage.Height);
+
+            outputImage.Save("warpedImage_3.jpg");
+            outputImageRansac.Save("warpedImageRansac_3.jpg");
+            Console.WriteLine($"Warped without ransac image_3 / with ransacimage_3 saved. \n");
+  
+            double[] scenePoint = [175, 225];      // Example scene point [x, y, 1]
+            double[] imagePoint = [333, 125];     // Example image point [u, v]
+
+            // Project scene point onto the target image
+            var (u, v) = CalculateProjectionOnImage(scenePoint, homographyMatrix);
+            Console.WriteLine($"Projected Image Point: u = {u}, v = {v}");
+
+            // Project image point back onto the scene
+            var (x, y) = CalculateProjectionOnScene(imagePoint, homographyMatrix);
+            Console.WriteLine($"Projected Scene Point: x = {x}, y = {y} \n");
+
+            // Example manually identified correspondences
+            double[,] scenePoints = { { 100, 100 }, { 200, 100 }, { 200, 200 }, { 100, 200 }, { 150, 150 } };
+            double[,] imagePoints = { { 110, 90 }, { 220, 95 }, { 225, 205 }, { 115, 210 }, { 165, 160 } };
+
+            // Calculate homography
+            homographyMatrix = FindHomography(scenePoints, imagePoints);
+
+            Console.WriteLine("Homography Matrix:");
+            PrintMatrix(homographyMatrix);
+
+            // Test points
+            double[,] testScenePoints = { { 130, 130 }, { 180, 120 }, { 160, 180 } };
+            double[,] testImagePoints = { { 140, 120 }, { 200, 110 }, { 170, 190 } };
+
+            // Calculate errors
+            for (int i = 0; i < testScenePoints.GetLength(0); i++)
+            {
+                double[] p = [testScenePoints[i, 0], testScenePoints[i, 1]];
+                (double projectedPoint_u, double projectedPoint_v) = CalculateProjectionOnImage(p, homographyMatrix);
+
+                double[] projectedPoint = [projectedPoint_u, projectedPoint_v];
+                double error = CalculateError(testImagePoints[i, 0], testImagePoints[i, 1], projectedPoint[0], projectedPoint[1]);
+
+                Console.WriteLine($"Error for test point {i}: {error:F3}");
+            }
+
+            CalculateScenePointOnTheImage(homographyMatrix);
+            CalculateImagePointOnTheScene(homographyMatrix);
+        }
+
+
 
         [SupportedOSPlatform("windows")]
         static void CalculateScenePointOnTheImage(double[,] homographyMatrix) {
@@ -398,7 +524,7 @@ namespace _244201001033_akcan_ercan_hw3
         }
 
         [SupportedOSPlatform("windows")]
-        public static double[] CalculateProjection( double[,] H, int x, int y)
+        public static double[] CalculateProjection(double[,] H, int x, int y)
         {
             double[,] H_inv = InverseHomography(H);
             double[] inputCoords = ApplyHomography(x, y, H_inv);
